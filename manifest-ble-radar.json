@@ -1,6 +1,6 @@
 {
   "name": "StickS3 BLE Radar",
-  "version": "0.1-near-far-rssi",
+  "version": "0.2-moving-color-rows",
   "home_assistant_domain": "esphome",
   "new_install_prompt_erase": false,
   "builds": [
