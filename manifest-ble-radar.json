@@ -1,6 +1,6 @@
 {
   "name": "StickS3 BLE Radar",
-  "version": "0.3-long-name-delta-2s",
+  "version": "0.4-threshold-peak1m",
   "home_assistant_domain": "esphome",
   "new_install_prompt_erase": false,
   "builds": [
