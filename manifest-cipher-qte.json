@@ -1,0 +1,25 @@
+{
+  "name": "StickS3 修机QTE 提示加速版",
+  "version": "0.7-warning-indicator-speedup",
+  "home_assistant_domain": "esphome",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "parts": [
+        {
+          "path": "cipher-qte-bootloader.bin",
+          "offset": 0
+        },
+        {
+          "path": "cipher-qte-partitions.bin",
+          "offset": 32768
+        },
+        {
+          "path": "cipher-qte-firmware.bin",
+          "offset": 65536
+        }
+      ]
+    }
+  ]
+}

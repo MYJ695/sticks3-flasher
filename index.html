@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StickS3 一键烧录</title>
+  <style>
+    :root { --bg:#fff7ed; --ink:#2b2118; --muted:#7c6756; --card:#ffffff; --line:#ead8c4; --accent:#d97706; --accent2:#92400e; --ok:#15803d; --bad:#b91c1c; }
+    *{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#fff7ed,#fffbeb);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}
+    main{max-width:980px;margin:0 auto;padding:28px 18px 44px} h1{margin:0 0 8px;font-size:32px} .lead{margin:0 0 22px;color:var(--muted);line-height:1.55}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 10px 28px rgba(120,70,20,.08)}
+    .card h2{font-size:18px;margin:0 0 8px}.card p{color:var(--muted);font-size:14px;line-height:1.5;min-height:62px}.meta{font-size:12px;color:#9a7b5f;margin:8px 0 14px;word-break:break-all}
+    button{appearance:none;border:0;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;padding:11px 14px;cursor:pointer;width:100%;font-size:15px}button:hover{background:var(--accent2)}button:disabled{opacity:.55;cursor:not-allowed}
+    .bar{height:12px;border-radius:99px;background:#ead8c4;overflow:hidden;margin:14px 0 8px}.fill{height:100%;width:0%;background:linear-gradient(90deg,#f59e0b,#ca8a04);transition:width .15s}
+    .status{margin-top:18px;background:#1f2937;color:#e5e7eb;border-radius:16px;padding:14px;min-height:170px}.status-head{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:8px}.pill{font-size:12px;border-radius:999px;background:#374151;padding:4px 9px;color:#fef3c7}
+    pre{margin:0;white-space:pre-wrap;word-break:break-word;font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;max-height:280px;overflow:auto}.foot{color:var(--muted);font-size:14px;line-height:1.6;margin-top:18px}.warn{color:#9a3412;font-weight:600}.ok{color:var(--ok)}.bad{color:var(--bad)}
+  </style>
+</head>
+<body>
+<main>
+  <h1>StickS3 一键烧录</h1>
+  <p class="lead">选择固件后，只需要点一次按钮并在浏览器弹窗里选择串口；页面会自动连接、下载 bin、写入 Flash、重启设备。</p>
+  <section class="grid" id="cards"></section>
+  <section class="status">
+    <div class="status-head"><b>烧录状态</b><span class="pill" id="progressText">等待操作</span></div>
+    <div class="bar"><div class="fill" id="progressFill"></div></div>
+    <pre id="log">请先用 USB 连接 StickS3，然后选择一个固件烧录。Chrome / Edge 需使用 http://127.0.0.1:8000/ 或 HTTPS 页面。</pre>
+  </section>
+  <section class="foot">
+    <ol>
+      <li>插上 StickS3，点击目标固件的 <b>选择串口并烧录</b>。</li>
+      <li>浏览器弹窗中选择 StickS3 串口后，后续步骤会自动完成。</li>
+      <li>若连接失败，关闭串口监视器，重新插拔 USB；必要时按住 Boot 键再点按钮。</li>
+    </ol>
+    <p class="warn">注意：浏览器安全限制无法绕过“选择串口”这个弹窗，但可以把弹窗之后的多次确认和 Connect/Install 点击合并为自动流程。</p>
+  </section>
+</main>
+<script type="module">
+import { ESPLoader, Transport } from 'https://unpkg.com/esptool-js@0.5.4/bundle.js';
+
+const FIRMWARES = [
+  { title:'修机 QTE 提示加速版', manifest:'manifest-cipher-qte.json', desc:'当前最新修机模拟器：失败提示、QTE 预警圆圈、灰色 Good / 深黄色 Perfect、进度加速。' },
+  { title:'艺术交互固件', manifest:'manifest-art-interaction.json', desc:'艺术交互/麦克风主题固件。适合回退到艺术互动小物模式。' },
+  { title:'VoiceStick 0.3.2', manifest:'manifest-voicestick-0.3.2.json', desc:'VoiceStick merged 单文件固件。' },
+];
+const cards = document.getElementById('cards');
+const logEl = document.getElementById('log');
+const progressFill = document.getElementById('progressFill');
+const progressText = document.getElementById('progressText');
+let busy = false;
+
+function log(msg){ logEl.textContent += '\n' + msg; logEl.scrollTop = logEl.scrollHeight; }
+function resetLog(msg){ logEl.textContent = msg; }
+function setProgress(p, txt){ progressFill.style.width = `${Math.max(0, Math.min(100, p))}%`; progressText.textContent = txt; }
+function setBusy(v){ busy = v; document.querySelectorAll('button[data-manifest]').forEach(b=>b.disabled=v); }
+function toBinaryString(u8){ let s=''; const chunk=0x8000; for(let i=0;i<u8.length;i+=chunk){ s += String.fromCharCode(...u8.subarray(i,i+chunk)); } return s; }
+
+async function loadManifest(path){
+  const res = await fetch(path, {cache:'no-store'});
+  if(!res.ok) throw new Error(`读取 manifest 失败: ${path} HTTP ${res.status}`);
+  return await res.json();
+}
+async function loadParts(manifest){
+  const build = manifest.builds?.find(b => (b.chipFamily || '').toUpperCase().includes('ESP32-S3')) || manifest.builds?.[0];
+  if(!build?.parts?.length) throw new Error('manifest 中没有可烧录 parts');
+  const fileArray = [];
+  let loaded = 0;
+  for(const part of build.parts){
+    log(`下载 ${part.path} @ 0x${Number(part.offset).toString(16)} ...`);
+    const res = await fetch(part.path, {cache:'no-store'});
+    if(!res.ok) throw new Error(`下载失败: ${part.path} HTTP ${res.status}`);
+    const u8 = new Uint8Array(await res.arrayBuffer());
+    loaded += u8.length;
+    fileArray.push({ data: toBinaryString(u8), address: Number(part.offset) });
+    log(`  OK ${u8.length} bytes`);
+  }
+  log(`固件合计 ${loaded} bytes，准备连接设备。`);
+  return fileArray;
+}
+
+async function selectPort(){
+  const remembered = await navigator.serial.getPorts();
+  if(remembered.length === 1){
+    log('检测到已授权串口，直接复用。');
+    return remembered[0];
+  }
+  if(remembered.length > 1){
+    log(`检测到 ${remembered.length} 个已授权串口，请在弹窗中确认本次使用的设备。`);
+  }
+  return await navigator.serial.requestPort();
+}
+
+async function flash(manifestPath){
+  if(busy) return;
+  if(!window.isSecureContext){ alert('当前页面不是安全上下文，Web Serial 会被 Edge/Chrome 禁用。请用 https:// 页面或 localhost 打开；http://100.x.x.x:8008 这种 Tailscale IP 地址虽然能访问页面，但不能使用串口。'); return; }
+  if(!('serial' in navigator)){ alert('当前浏览器没有开放 Web Serial。请确认使用桌面版 Chrome/Edge，并且设备插在当前这台打开浏览器的电脑上。'); return; }
+  setBusy(true); setProgress(0, '选择串口'); resetLog('请选择 StickS3 串口...');
+  let transport;
+  try{
+    // requestPort() 必须紧跟真实点击触发，不能放在 fetch/await 下载之后，否则 Chrome/Edge 会报 Must be handling a user gesture。
+    const port = await selectPort();
+    setProgress(2, '读取固件');
+    log(`读取 ${manifestPath} ...`);
+    const manifest = await loadManifest(manifestPath);
+    log(`固件: ${manifest.name || manifestPath} / ${manifest.version || ''}`);
+    const fileArray = await loadParts(manifest);
+    transport = new Transport(port, true);
+    const terminal = { clean(){}, writeLine(data){ log(String(data)); }, write(data){ log(String(data)); } };
+    const loader = new ESPLoader({ transport, baudrate: 460800, terminal, debugLogging:false });
+    setProgress(12, '连接设备');
+    const chip = await loader.main();
+    log(`已连接: ${chip}`);
+    setProgress(18, '写入中');
+    await loader.writeFlash({
+      fileArray,
+      flashMode: 'dio',
+      flashFreq: '40m',
+      flashSize: '8MB',
+      eraseAll: false,
+      compress: true,
+      reportProgress: (fileIndex, written, total) => {
+        const partBase = 18 + fileIndex * (72 / Math.max(1, fileArray.length));
+        const partSpan = 72 / Math.max(1, fileArray.length);
+        const pct = partBase + partSpan * (total ? written / total : 0);
+        setProgress(pct, `写入 ${fileIndex + 1}/${fileArray.length} ${Math.floor(total ? written * 100 / total : 0)}%`);
+      }
+    });
+    setProgress(94, '重启设备');
+    try { await loader.after('hard_reset'); } catch(e) { log(`重启提示: ${e?.message || e}`); }
+    setProgress(100, '完成');
+    log('烧录完成，设备已重启。');
+  } catch(err){
+    setProgress(0, '失败');
+    log(`ERROR: ${err?.message || err}`);
+    console.error(err);
+  } finally {
+    try { if(transport) await transport.disconnect(); } catch(e) {}
+    setBusy(false);
+  }
+}
+
+for(const fw of FIRMWARES){
+  const el = document.createElement('article');
+  el.className = 'card';
+  el.innerHTML = `<h2>${fw.title}</h2><p>${fw.desc}</p><div class="meta">${fw.manifest}</div><button data-manifest="${fw.manifest}">选择串口并烧录</button>`;
+  cards.appendChild(el);
+}
+document.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-manifest]');
+  if(btn) flash(btn.dataset.manifest);
+});
+</script>
+</body>
+</html>

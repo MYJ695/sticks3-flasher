@@ -1,0 +1,17 @@
+{
+  "name": "VoiceStick StickS3 Firmware 0.3.2",
+  "version": "0.3.2-merged",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "improv": false,
+      "parts": [
+        {
+          "path": "voicestick-firmware-sticks3-merged-0.3.2.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
