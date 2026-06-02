@@ -1,0 +1,41 @@
+﻿{
+    "builds":  [
+                   {
+                       "chipFamily":  "ESP32-S3",
+                       "parts":  [
+                                     {
+                                         "offset":  0,
+                                         "path":  "hub/hub-bootloader.bin"
+                                     },
+                                     {
+                                         "offset":  32768,
+                                         "path":  "hub/hub-partitions.bin"
+                                     },
+                                     {
+                                         "offset":  65536,
+                                         "path":  "hub/launcher-hub.bin"
+                                     },
+                                     {
+                                         "offset":  1114112,
+                                         "path":  "hub/stardew-fishing-demo.bin"
+                                     },
+                                     {
+                                         "offset":  2686976,
+                                         "path":  "hub/voice-recorder.bin"
+                                     },
+                                     {
+                                         "offset":  3735552,
+                                         "path":  "hub/cipher-qte.bin"
+                                     },
+                                     {
+                                         "offset":  4784128,
+                                         "path":  "hub/art-interaction.bin"
+                                     }
+                                 ],
+                       "improv":  false
+                   }
+               ],
+    "name":  "StickS3 Firmware Hub",
+    "version":  "hub-2026-06-02",
+    "new_install_prompt_erase":  false
+}
