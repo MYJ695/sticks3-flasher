@@ -1,0 +1,27 @@
+﻿{
+    "generated_at":  "2026-06-02T08:35:18Z",
+    "device":  "M5-StickS3",
+    "note":  "These are PlatformIO app binaries for M5Launcher WebUI or SD install, not full flash images.",
+    "apps":  [
+                 {
+                     "project":  "stardew-fishing-demo",
+                     "file":  "stardew-fishing-demo.bin",
+                     "bytes":  1219376
+                 },
+                 {
+                     "project":  "voice-recorder",
+                     "file":  "voice-recorder.bin",
+                     "bytes":  577904
+                 },
+                 {
+                     "project":  "cipher-qte",
+                     "file":  "cipher-qte.bin",
+                     "bytes":  594608
+                 },
+                 {
+                     "project":  "art-interaction",
+                     "file":  "art-interaction.bin",
+                     "bytes":  560624
+                 }
+             ]
+}
