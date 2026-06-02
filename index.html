@@ -157,15 +157,6 @@
   <section class="section-inner note-band" id="help">
     <div class="note">
       <b>注意：</b>浏览器安全限制无法绕过“选择串口”这个系统弹窗，但本页面会把弹窗之后的连接、下载、写入和重启合并为自动流程。若连接失败，关闭其他串口工具，重新插拔 USB；必要时按住 Boot 键再点击烧录。
-      <br><br>
-      <b>Launcher app-only 固件：</b>下面这些 `.bin` 不是从 0 地址直接烧录的完整固件。先烧录 <b>M5Launcher for StickS3</b>，再通过 Launcher 的 WebUI 或 SD 安装。
-      <ul>
-        <li><a href="launcher-apps/stardew-fishing-demo.bin" download>stardew-fishing-demo.bin</a></li>
-        <li><a href="launcher-apps/voice-recorder.bin" download>voice-recorder.bin</a></li>
-        <li><a href="launcher-apps/stickvoice-0.3.2-merged.bin" download>stickvoice-0.3.2-merged.bin</a>（merged）</li>
-        <li><a href="launcher-apps/cipher-qte.bin" download>cipher-qte.bin</a></li>
-        <li><a href="launcher-apps/art-interaction.bin" download>art-interaction.bin</a></li>
-      </ul>
     </div>
   </section>
 </main>
@@ -173,7 +164,6 @@
 import { ESPLoader, Transport } from 'https://unpkg.com/esptool-js@0.5.4/bundle.js';
 
 const FIRMWARES = [
-  { title:'M5Launcher for StickS3', manifest:'manifest-launcher-sticks3.json', desc:'M5-StickS3 专用多固件启动器。先烧这个，再通过 Launcher WebUI/SD 安装下面的 app-only 固件。' },
   { title:'星露谷钓鱼 Demo', manifest:'manifest-fishing-demo.json', desc:'竖屏像素风钓鱼小游戏：鱼漂、HIT、钓鱼条、多鱼种难度、垃圾直出和背包统计。' },
   { title:'StickS3 录音机', manifest:'manifest-voice-recorder-dark.json', desc:'按住 A 录音，松开保存；B 切换模式。深色黑白极简界面，无版本标记。' },
   { title:'修机 QTE 提示加速版', manifest:'manifest-cipher-qte.json', desc:'第五人格风格修机模拟器：QTE 预警圆圈、Good / Perfect 判定、失败提示和进度加速。' },
