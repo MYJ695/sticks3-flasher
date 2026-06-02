@@ -1,7 +1,7 @@
 ﻿{
-    "generated_at":  "2026-06-02T08:35:18Z",
+    "generated_at":  "2026-06-02T08:39:52Z",
     "device":  "M5-StickS3",
-    "note":  "These are PlatformIO app binaries for M5Launcher WebUI or SD install, not full flash images.",
+    "note":  "PlatformIO app binaries plus VoiceStick merged binary for M5Launcher WebUI or SD install. App-only bins are not full flash images.",
     "apps":  [
                  {
                      "project":  "stardew-fishing-demo",
@@ -22,6 +22,12 @@
                      "project":  "art-interaction",
                      "file":  "art-interaction.bin",
                      "bytes":  560624
+                 },
+                 {
+                     "project":  "stickvoice",
+                     "file":  "stickvoice-0.3.2-merged.bin",
+                     "bytes":  1483584,
+                     "type":  "merged"
                  }
              ]
 }
