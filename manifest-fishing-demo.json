@@ -1,0 +1,25 @@
+{
+  "name": "StickS3 Stardew Fishing Demo",
+  "version": "fishing-demo-2026-06-02",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "improv": false,
+      "parts": [
+        {
+          "path": "fishing-demo-bootloader.bin",
+          "offset": 0
+        },
+        {
+          "path": "fishing-demo-partitions.bin",
+          "offset": 32768
+        },
+        {
+          "path": "fishing-demo-firmware.bin",
+          "offset": 65536
+        }
+      ]
+    }
+  ]
+}
