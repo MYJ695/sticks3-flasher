@@ -1,0 +1,17 @@
+{
+  "name": "StickS3 Voice Recorder Dark",
+  "version": "voice-recorder-dark-2026-06-02",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "improv": false,
+      "parts": [
+        {
+          "path": "stick-s3-voice-recorder-dark-2026-06-02.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
