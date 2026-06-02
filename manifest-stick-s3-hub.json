@@ -12,6 +12,10 @@
                                          "path":  "hub/hub-partitions.bin"
                                      },
                                      {
+                                         "offset":  57344,
+                                         "path":  "hub/hub-otadata-reset.bin"
+                                     },
+                                     {
                                          "offset":  65536,
                                          "path":  "hub/launcher-hub.bin"
                                      },
