@@ -40,6 +40,6 @@
                    }
                ],
     "name":  "StickS3 Firmware Hub",
-    "version":  "hub-2026-06-02",
+    "version":  "hub-2026-06-02-r2",
     "new_install_prompt_erase":  false
 }
