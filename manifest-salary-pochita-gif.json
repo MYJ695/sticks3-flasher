@@ -1,0 +1,25 @@
+{
+  "name": "StickS3 SalaryCat + Pochita GIF",
+  "version": "salary-pochita-gif-2026-06-09",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "improv": false,
+      "parts": [
+        {
+          "path": "salary-pochita-bootloader.bin",
+          "offset": 0
+        },
+        {
+          "path": "salary-pochita-partitions.bin",
+          "offset": 32768
+        },
+        {
+          "path": "salary-pochita-firmware.bin",
+          "offset": 65536
+        }
+      ]
+    }
+  ]
+}
