@@ -1,6 +1,6 @@
 {
   "name": "StickS3 Score TV",
-  "version": "score-tv-worldcup-live-score-latch-2026-06-12",
+  "version": "score-tv-button-irq-2026-06-12",
   "new_install_prompt_erase": false,
   "builds": [
     {
