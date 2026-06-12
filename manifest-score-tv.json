@@ -1,0 +1,25 @@
+{
+  "name": "StickS3 Score TV",
+  "version": "score-tv-worldcup-live-score-latch-2026-06-12",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "improv": false,
+      "parts": [
+        {
+          "path": "score-tv-bootloader.bin",
+          "offset": 0
+        },
+        {
+          "path": "score-tv-partitions.bin",
+          "offset": 32768
+        },
+        {
+          "path": "score-tv-firmware.bin",
+          "offset": 65536
+        }
+      ]
+    }
+  ]
+}
